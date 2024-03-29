@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post {{ post.id }}</title>
+</head>
+<body>
+    <h1>Posted {{ post.displayRelativeTime }}</h1>
+    <h2 class="timestamp" data-ts="{{ post.datetime|date('U') }}">{{ post.datetime|date('F j Y g:i:sa') }}</h2>
+    <div>
+        {{ post.text }}
+    </div>
+    <script>
+        window.addEventListener('DOMContentLoaded', function(){
+            const timestamps = document.querySelectorAll('.timestamp')
+            if(0 < timestamps.length) {
+                for(const t of timestamps) {
+                    const time = t.dataset.ts * 1000
+                    t.innerText = (new Date(time)).toLocaleString()
+                }
+            }
+        })
+    </script>
+</body>
+</html>
