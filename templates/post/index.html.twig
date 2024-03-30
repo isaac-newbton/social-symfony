@@ -1,26 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post {{ post.id }}</title>
-</head>
-<body>
-    <h1>Posted {{ post.displayRelativeTime }}</h1>
-    <h2 class="timestamp" data-ts="{{ post.datetime|date('U') }}">{{ post.datetime|date('F j Y g:i:sa') }}</h2>
-    <div>
-        {{ post.text }}
-    </div>
-    <script>
-        window.addEventListener('DOMContentLoaded', function(){
-            const timestamps = document.querySelectorAll('.timestamp')
-            if(0 < timestamps.length) {
-                for(const t of timestamps) {
-                    const time = t.dataset.ts * 1000
-                    t.innerText = (new Date(time)).toLocaleString()
-                }
-            }
-        })
-    </script>
-</body>
-</html>
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello PostController!{% endblock %}
+
+{% block body %}
+<main>
+    <h1>{{ posts|length }} Posts:</h1>
+    {% if posts|length > 0 %}
+        <ol>
+            {% for post in posts %}
+                <li>
+                    <strong>{{ post.id }}:</strong> <em>{{ post.displayRelativeTime }} ({{ post.datetime|date('F j Y g:i:sa') }})</em>
+                    <br>
+                    {{ post.text }} (<a href="{{ url('draft_post', {id: post.id}) }}">Edit</a>)
+                    {% if post.mediaAttachments|length > 0 %}
+                    <br>
+                        {{ post.mediaAttachments|length }} attachment(s):
+                        <ul>
+                            {% for attachment in post.mediaAttachments %}
+                                <li>
+                                    {{ attachment.id }}: {{ attachment.title }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    <br>
+                    <a href="{{ url('view_post', {id: post.id}) }}">View</a>
+                    <a href="{{ url('delete_post', {id: post.id}) }}">Delete</a>
+                </li>
+            {% endfor %}
+        </ol>
+    {% else %}
+        no posts found
+    {% endif %}
+    
+    
+</main>
+{% endblock %}

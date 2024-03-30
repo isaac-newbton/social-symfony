@@ -2,18 +2,32 @@
 
 namespace App\Controller;
 
+use App\Entity\MediaAttachment;
 use App\Entity\Post;
 use App\Repository\PostRepository;
+use App\Service\FileUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Constraints\File;
 
 class PostController extends AbstractController
 {
+    #[Route('/posts', name: 'posts_index')]
+    public function index(EntityManagerInterface $entityManager): Response
+    {
+        $posts = $entityManager->getRepository(Post::class)->findAll();
+        return $this->render('post/index.html.twig', [
+            'posts' => $posts
+        ]);
+    }
+
     #[Route('/post', name: 'new_post')]
     public function newPost(EntityManagerInterface $entityManager): Response
     {
@@ -24,14 +38,47 @@ class PostController extends AbstractController
     }
 
     #[Route('/post/draft/{id}', name: 'draft_post')]
-    public function draftPost(EntityManagerInterface $entityManager, string $id): Response
+    public function draftPost(Request $request, FileUploader $uploader, EntityManagerInterface $entityManager, string $id): Response
     {
         $post = $entityManager->getRepository(Post::class)->find($id);
 
         $form = $this->createFormBuilder($post)
             ->add('text', TextareaType::class)
+            ->add('attachments', FileType::class, [
+                'label' => 'Attachment (Images Only)',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1024k',
+                        'mimeTypes' => [
+                            'image/png',
+                            'image/jpeg',
+                            'image/gif',
+                        ],
+                        'mimeTypesMessage' => 'Please upload a valid image file (jpg/png/gif/webp)'
+                    ])
+                ]
+            ])
             ->add('save', SubmitType::class, ['label'=>'Post'])
             ->getForm();
+
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()) {
+            $imageFile = $form->get('attachments')->getData();
+            if($imageFile) {
+                $attachment = new MediaAttachment();
+                $imageFilename = $uploader->upload($imageFile, date('Y') . '/' . date('m'), $attachment);
+                $attachment->setTitle(pathinfo($imageFilename, PATHINFO_FILENAME));
+                $attachment->setPost($post);
+                $entityManager->persist($attachment);
+            }
+
+            $post->setText($form->get('text')->getData());
+            $entityManager->persist($post);
+            $entityManager->flush();
+            return $this->redirectToRoute('posts_index');
+        }
 
         return $this->render('post/draft.html.twig', [
             'form' => $form,
@@ -43,9 +90,20 @@ class PostController extends AbstractController
     public function viewPost(EntityManagerInterface $entityManager, string $id): Response
     {
         $post = $entityManager->getRepository(Post::class)->find($id);
-        return $this->render('post/index.html.twig', [
+        return $this->render('post/single.html.twig', [
             'post' => $post
         ]);
+    }
+
+    #[Route('/post/{id}/delete', name: 'delete_post')]
+    public function delete(EntityManagerInterface $entityManager, string $id): Response
+    {
+        $post = $entityManager->getRepository(Post::class)->find($id);
+        if($post) {
+            $entityManager->remove($post);
+            $entityManager->flush();
+        }
+        return $this->redirectToRoute('posts_index');
     }
 
     #[Route('/posts/cleanup', name: 'cleanup_posts')]

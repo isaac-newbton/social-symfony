@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello MediaAttachmentController!{% endblock %}
+
+{% block body %}
+<main>
+    <h1>{{ attachment.title }}</h1>
+    <img src="{{ attachment.path }}" alt="{{ attachment.title }}">
+</main>
+{% endblock %}

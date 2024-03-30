@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello MediaAttachmentController!{% endblock %}
+
+{% block body %}
+<main>
+    <h1>{{ attachments|length }} Attachments:</h1>
+    {% if attachments|length > 0 %}
+        <ol>
+            {% for attachment in attachments %}
+                <li>
+                    <strong>{{ attachment.id }}:</strong> <em>{{ attachment.title }}</em>
+                    <br>
+                    {{ attachment.systemPath }}
+                    <br>
+                    <a href="{{ url('delete_media', {id: attachment.id}) }}">Delete</a>
+                </li>
+            {% endfor %}
+        </ol>
+    {% else %}
+        no attachments found
+    {% endif %}
+    
+    
+</main>
+{% endblock %}
