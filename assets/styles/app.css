@@ -1,3 +1,52 @@
+html {
+    font-size: 15px;
+}
+
+@media(min-width: 768px) {
+    html {
+        font-size: clamp(15px, 1.625vw, 20.8px);
+    }
+}
+
 body {
-    background-color: skyblue;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+h1, .h1,
+h2, .h2,
+h3, .h3,
+h4, .h4,
+h5, .h5,
+h6, .h6 {
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-block: 0 0.5em;
+}
+
+h1, .h1 {
+    font-size: 2.4rem;
+}
+
+h2, .h2 {
+    font-size: 1.9rem;
+}
+
+h3, .h3 {
+    font-size: 1.5rem;
+}
+
+h4, .h4 {
+    font-size: 1.3rem;
+}
+
+h5, .h5 {
+    font-size: 1.1rem;
+}
+
+h6, .h6 {
+    font-size: 1rem;
 }

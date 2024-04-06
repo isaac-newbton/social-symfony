@@ -1,0 +1,13 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Site Index{% endblock %}
+
+{% block body %}
+    <h1>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Magni, eum!</h1>
+    <h2>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Laboriosam, repellendus?</h2>
+    <h3>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis, quo!</h3>
+    <h4>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi, consequuntur?</h4>
+    <h5>Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum, magni.</h5>
+    <h6>Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati, dolores?</h6>
+    {{ component('Post', { post: post }) }}
+{% endblock %}

@@ -19,6 +19,15 @@ use Symfony\Component\Validator\Constraints\File;
 
 class PostController extends AbstractController
 {
+    #[Route('/', name: 'site_index')]
+    public function siteIndex(EntityManagerInterface $entityManager): Response
+    {
+        
+        return $this->render('index.html.twig', [
+            'post' => $entityManager->getRepository(Post::class)->find('018ea1eb-6fb2-7052-baa0-99cb9fc0e36d')
+        ]);
+    }
+
     #[Route('/posts', name: 'posts_index')]
     public function index(EntityManagerInterface $entityManager): Response
     {
